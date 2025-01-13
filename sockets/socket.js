@@ -1,19 +1,26 @@
-const { io } = require('../index');
-
+const { io } = require("../index");
+const { checkJWT } = require("../helpers/jwt");
+const {connectedUser, disconnectedUser} = require('../controllers/socket');
 
 // Mensajes de Sockets
-io.on('connection', client => {
-    console.log('Cliente conectado');
+io.on('connection', (client) => {
 
-    client.on('disconnect', () => {
-        console.log('Cliente desconectado');
-    });
+  // Leemos headers del cliente Dart/flutter y desestructuramos 'valid' y 'uid' que viene desde /helpers/jwt
+  const [valid, uid] = checkJWT(client.handshake.headers['x-token']);
 
-    // client.on('mensaje', ( payload ) => {
-    //     console.log('Mensaje', payload);
-    //     io.emit( 'mensaje', { admin: 'Nuevo mensaje' } );
+  // Verificar autenticación
+  if(!valid) {return client.disconnect();}
 
-    // });
+  // Cliente autenticado
+  connectedUser(uid);
 
+  client.on('disconnect', () => {
+    disconnectedUser(uid);
+  });
 
+  // client.on('mensaje', ( payload ) => {
+  //     console.log('Mensaje', payload);
+  //     io.emit( 'mensaje', { admin: 'Nuevo mensaje' } );
+
+  // });
 });
