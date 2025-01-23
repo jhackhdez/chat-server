@@ -3,7 +3,7 @@
  */
 
 const User = require("../models/user");
-const { use } = require("../routes/auth");
+const Message = require("../models/message");
 
 const connectedUser = async (uid = "") => {
   const user = await User.findById(uid);
@@ -16,16 +16,34 @@ const connectedUser = async (uid = "") => {
 };
 
 const disconnectedUser = async (uid = "") => {
-    const user = await User.findById(uid);
-    user.online = false;
-  
-    // se graba en BBDD
-    await user.save();
-  
-    return user;
-  };
+  const user = await User.findById(uid);
+  user.online = false;
+
+  // se graba en BBDD
+  await user.save();
+
+  return user;
+};
+
+const saveMessage = async (payload) => {
+  /*
+    {
+      from: ''
+      to: ''
+      text: ''
+    }
+  */
+  try {
+    const message = new Message(payload);
+    await message.save();
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
 
 module.exports = {
   connectedUser,
-  disconnectedUser
+  disconnectedUser,
+  saveMessage,
 };

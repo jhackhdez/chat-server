@@ -1,5 +1,5 @@
 /**
- * path: api/login
+ * path: /api/login
  */
 
 const { Router } = require("express");
