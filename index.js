@@ -1,4 +1,6 @@
 const express = require("express");
+const cors = require("cors");
+
 const path = require("path");
 require("dotenv").config();
 
@@ -10,10 +12,18 @@ const app = express();
 
 // Lectura y parseo del Body (lo que llega en petición http => get, post, put, delete etc)
 app.use(express.json());
+app.use(cors());
 
 // Node Server
 const server = require("http").createServer(app);
-module.exports.io = require("socket.io")(server);
+module.exports.io = require("socket.io")(server, {
+  cors: {
+    origin: "http://localhost:4200",
+    credentials: true,
+    methods: ["GET", "POST"],
+    allowedHeaders: ["x-token"],
+  }
+});
 require("./sockets/socket");
 
 // Path público
